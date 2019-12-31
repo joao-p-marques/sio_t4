@@ -37,7 +37,7 @@ Por outro lado, realizamos uma procura diretamente por aplicações de confiname
 	Binary file usr/share/locale/vi/LC_MESSAGES/util-linux.mo matches
 	Binary file usr/share/locale/zh_CN/LC_MESSAGES/util-linux.mo matches
 	```
-* [Docker](https://docker.com): permite criar uma abiente virtual no qual a aplicação está confinada a um sistema que apenas contém os serviços que precisa e apenas expõe os necessários. Pela análise do `syslog`, o *driver* foi inicializado, mas não sabemos ainda se foi usado no sistema. 
+* [Docker](https://docker.com): permite criar um ambiente virtual no qual a aplicação está confinada a um sistema que apenas contém os serviços que precisa e apenas expõe os necessários. Pela análise do `syslog`, o *driver* foi inicializado, mas não sabemos ainda se foi usado no sistema. 
 	```bash
 	root@vm /m/reference_root# grep -r "Docker"
 	etc/services:docker          2375/tcp                # Docker REST API (plain text)
@@ -230,7 +230,18 @@ Verificamos, principalmente por análise do ficheiro `etc/httpd/logs/error_log`,
 
 Também não foi possível inserir ficheiros e dados em determinados diretórios do sistema pela mesma razão.
 
+### Que alterações foram realizadas e qual o propósito aparente?
+
+Alteraçoes
+
+### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
+
+Sim,
+
+### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
  
+Ay
+
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTQ5MjQ3MDk1OCwxOTM3NzY1OTU0LDQwOD
 I0MTQ0MCwxNzY5OTMyMzUwLDE3Njk5MzIzNTAsMTg4NzkyMjQx
