@@ -231,8 +231,10 @@ Verificamos, principalmente por análise do ficheiro `etc/httpd/logs/error_log`,
 Também não foi possível inserir ficheiros e dados em determinados diretórios do sistema pela mesma razão.
 
 ### Que alterações foram realizadas e qual o propósito aparente?
-
-Alteraçoes
+O atacante consegui injetar ficheiros através de SQL Injection, então injetou um ficheiro PHP,
+ * Injetou payload php
+ * Payload funciona como reverse shell
+ * Conseguiu executar sudoless commands na maquina, o que permitiu acesso aos ficheiros e tudo mais.
 
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
@@ -257,7 +259,8 @@ Como conseguimos ver pelo log, vários ficheiros foram transferidos, incluindo f
 
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
  
-Ay
+Provavelmente assim que a backdoor foi criada, a firewall externa foi bypassed pois o ataque passou a vir de "dentro".
+Confirmar isto aqui
 
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTQ5MjQ3MDk1OCwxOTM3NzY1OTU0LDQwOD
