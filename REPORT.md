@@ -261,6 +261,21 @@ Como conseguimos ver pelo log, vários ficheiros foram transferidos, incluindo f
  
 Provavelmente assim que a backdoor foi criada, a firewall externa foi bypassed pois o ataque passou a vir de "dentro".
 Confirmar isto aqui
+```
+user@vm:/mnt/hacked_root$ sudo cat root/shieldsup.sh
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -j DROP
+iptables -A FORWARD -j DROP
+user@vm:/mnt/hacked_root$ sudo cat root/shieldsdown.sh
+[sudo] password for user: 
+iptables -A INPUT -j ACCEPT
+iptables -A FORWARD -j ACCEPT
+iptables --flush
+
+```
 
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTQ5MjQ3MDk1OCwxOTM3NzY1OTU0LDQwOD
