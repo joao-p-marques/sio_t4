@@ -259,8 +259,7 @@ Como conseguimos ver pelo log, vários ficheiros foram transferidos, incluindo f
 
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
  
-Provavelmente assim que a backdoor foi criada, a firewall externa foi bypassed pois o ataque passou a vir de "dentro".
-Confirmar isto aqui
+Analise dos ficheiros, shieldsup adota whitelist, em que so aceita certo trafego e bloqueia todo o resto. Enquanto que o shields down aceita todo o tipo de trafego. O user correu o shiledsdown para poder aceitar todo o conteudo?
 ```
 user@vm:/mnt/hacked_root$ sudo cat root/shieldsup.sh
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
