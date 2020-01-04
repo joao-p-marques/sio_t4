@@ -231,14 +231,13 @@ Verificamos, principalmente por análise do ficheiro `etc/httpd/logs/error_log`,
 Também não foi possível inserir ficheiros e dados em determinados diretórios do sistema pela mesma razão.
 
 ### Que alterações foram realizadas e qual o propósito aparente?
-O atacante consegui injetar ficheiros através de SQL Injection, então injetou um ficheiro PHP,
- * Injetou payload php
- * Payload funciona como reverse shell
- * Conseguiu executar sudoless commands na maquina, o que permitiu acesso aos ficheiros e tudo mais.
+
+Alterou uma imagem road.png com o steg drop py e conseguiu criar um codigo na imagem
 
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
 Sim foram realizadas transferências, o atacante deve ter notado que ao clicarmos no catálogo de carros, o método para descarregar ficheiros era através de um php denominado **downloads.php**, pelo que o user tentou aceder outros ficheiros através desse link e conseguiu com sucesso, visto que nao havia confinamento a nivel do diretório de downloads e ele pode voltar atras nos diretórios.
+Pode receber resposta 200 mas nao receber o ficheiro certo, por isso temos de arranjar forma de verificar quais files foram transferidos.
 
 ```
 192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] "GET /download.php?item=Brochure.pdf HTTP/1.1" 200 13305
