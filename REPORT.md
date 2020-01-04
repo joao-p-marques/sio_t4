@@ -263,8 +263,9 @@ Apesar de as respostas terem sido todas de sucesso (200), nem todos os ficheiros
 E como conseguimos ver, o atacante conseguiu transferir alguns ficheiros criticos de sistema como **config.php** e **display.php** que lhe permitiram visualizar informação **crítica** do sistema.
 
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
- 
-Analise dos ficheiros, shieldsup adota whitelist, em que so aceita certo trafego e bloqueia todo o resto. Enquanto que o shields down aceita todo o tipo de trafego. O user correu o shiledsdown para poder aceitar todo o conteudo?
+
+Ao pesquisarmos nos ficheiros do sistema, conseguimos encontrar dois ficheiros que são de extrema importancia, pois regem as configurações das firewalls.
+
 ```bash
 user@vm:/mnt/hacked_root$ sudo cat root/shieldsup.sh
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -278,8 +279,18 @@ user@vm:/mnt/hacked_root$ sudo cat root/shieldsdown.sh
 iptables -A INPUT -j ACCEPT
 iptables -A FORWARD -j ACCEPT
 iptables --flush
-
 ```
+
+Através da análise destas configurações do iptables, conseguimos perceber que a configuração inicial do shieldsup.sh aceita:  
+* Pacotes do tipo ICMP
+* Pacotes vindo da interface lo
+* Pacotes novos TCP ao porto 80
+E recusa:  
+ * Tudo o que não tiver sido declarado anteriormente, logo adotando uma politica de whitelisting.
+
+Já o shieldsdown.sh parece aceitar todo o tipo de pacotes, dai o nome dos escudos estarem em baixo, pois a proteção oferecida foi retirada.
+
+Suspeitamos que o atacante tenha inicialmente realizado transferências e dai as podermos visualizar no tráfego da firewall externa, no entanto o user já tinha passado a barreira da firewall externa, portanto as suas restantes ações foram realizadas dentro do sistema (na zona desmilitarizada) e por isso não foram captadas pela firewall externa.
 
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTQ5MjQ3MDk1OCwxOTM3NzY1OTU0LDQwOD
