@@ -234,7 +234,12 @@ Também não foi possível inserir ficheiros e dados em determinados diretórios
 
 ### Que alterações foram realizadas e qual o propósito aparente?
 
-Alterou uma imagem road.png com o steg drop py e conseguiu criar um codigo na imagem
+Uma das alterações principais foi realizada na pasta `var/www/html/images` , à imagem road.jpg. Esta nova versão da imagem contêm uma mensagem escondida na imagem, algo denominado esteganografia. Ao dar decode da imagem usando uma [ferramenta](http://stylesuxx.github.io/steganography/), conseguimos extrair a mensagem no inicio da imagem que diz:
+```
+Parabéns!
+https://elearning.ua.pt/mod/assign/view.php?id=647250
+```
+Esta alteração foi possivel porque o utilizador descarregou um ficheiro pelo [link](https://bit.ly/2LRYDSQ%20). Este script, que não conseguimos transferir, foi a arma do ataque e realizou as mudanças na imagem atraves de estaganografia. O link já não se encontra disponivel e como o script foi colocado no diretório /tmp/, já não está presente no sistema.
 
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
