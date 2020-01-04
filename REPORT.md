@@ -265,7 +265,7 @@ E como conseguimos ver, o atacante conseguiu transferir alguns ficheiros critico
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
  
 Analise dos ficheiros, shieldsup adota whitelist, em que so aceita certo trafego e bloqueia todo o resto. Enquanto que o shields down aceita todo o tipo de trafego. O user correu o shiledsdown para poder aceitar todo o conteudo?
-```
+```bash
 user@vm:/mnt/hacked_root$ sudo cat root/shieldsup.sh
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -p icmp -j ACCEPT
