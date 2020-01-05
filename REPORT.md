@@ -241,6 +241,8 @@ O atacante explorou a vulnerabilidade a **SQL Injection** no *PHP* que tinha sid
 
 Por outro lado, aproveitou a falta de **confinamento** das aplicações e explorou esta vulnerabilidade de forma a aceder a todo o sistema a partir da vulnerabilidade persente no servidor *Apache*.
 
+Além disso, aproveitou o facto da máquina do servidor web ter um servidor **ssh** aberto com autenticação por password (vulnerável a ataques por *brute force*) e de o servidor da base de dados estar na mesma máquina.
+
 #### Quais o atacante tentou explorar mas foram barradas?
 
 Verificamos, principalmente por análise do ficheiro `etc/httpd/logs/error_log`, que o atacante tentou aproveitar as vulnerabilidades no *PHP* para aceder à base de dados e a outros dados de sistema, mas não conseguiu devido ao **confinamento** de cada serviço a um utilizador diferente e à limitação de **permissões** para cada ficheiro.
@@ -305,14 +307,9 @@ E recusa:
 
 Já o shieldsdown.sh parece aceitar todo o tipo de pacotes, dai o nome dos escudos estarem em baixo, pois a proteção oferecida foi retirada.
 
-Suspeitamos que o atacante tenha inicialmente realizado transferências e dai as podermos visualizar no tráfego da firewall externa, no entanto o user já tinha passado a barreira da firewall externa, portanto as suas restantes ações foram realizadas dentro do sistema (na zona desmilitarizada) e por isso não foram captadas pela firewall externa.
+O facto de termos encontrado estes ficheiros na maquina do servidor web leva-nos a crer que, no sistema em produção, a máquina que actua como firewall externa é a mesma que o próprio servidor, o que potenciou o acesso descrito anteriormente sem qualquer controlo.
 
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ5MjQ3MDk1OCwxOTM3NzY1OTU0LDQwOD
-I0MTQ0MCwxNzY5OTMyMzUwLDE3Njk5MzIzNTAsMTg4NzkyMjQx
-NCw5OTk4ODMwMzcsLTUxNzQ3MzMyLC0xOTAyMzc5Nzk3LC0zOD
-UyOTg5NTYsMTM3Mjk4Mjc2OSwtMTAxNjgxNTAzMywyMDU3NTQ2
-NDczLC0xODE2MTQ3NjQ0LC0xODI1MDI5NTU5LDE2MjE5MjU2OS
-wtMTQ1MTcxNjk5OCwtMjAzNTU0NjM3NiwxNjA5MjIyNTc3LDEz
-NzI3OTg4NF19
--->
+Suspeitamos que o atacante tenha inicialmente realizado transferências e dai as podermos visualizar no tráfego da firewall externa.
+
+No entanto, tendo criada a **backdoor**, o user ganhou acesso ao sistema por completo, executando comandos numa sessão *ssh* encriptada e, portanto, impossível de analisar pela firewall. Por outro lado, pôde remover as limitações da firewall uma vez dentro da máquina.
+
