@@ -7,11 +7,11 @@ João Marques - 89234
 ## Topics:
 
 1. [O que estava implementado a nível de confinamento de aplicações?](#O-que-estava-implementado-a-nível-de-confinamento-de-aplicações?)
-2. [Qual a sequência de ações que o atacante tomou?]()
-3. [Que vulnerabilidades foram exploradas e como?]()
-4. [Que alterações foram realizadas e qual o propósito aparente?]()
-5. [Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?]()
-6. [Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?]()
+2. [Qual a sequência de ações que o atacante tomou?](#qual-a-sequência-de-ações-que-o-atacante-tomou)
+3. [Que vulnerabilidades foram exploradas e como?](#que-vulnerabilidades-foram-exploradas-e-como)
+4. [Que alterações foram realizadas e qual o propósito aparente?](#que-alterações-foram-realizadas-e-qual-o-propósito-aparente)
+5. [Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?](#foram-realmente-realizadas-transferências-se-sim-como-e-qual-o-conteúdo)
+6. [Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?](#porque-é-que-a-Firewall-externa-detetou-transferências-mas-nao-detetou-as-restantes-ações)
 
 ### O que estava implementado a nível de confinamento de aplicações?
 
