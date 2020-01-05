@@ -260,6 +260,8 @@ https://elearning.ua.pt/mod/assign/view.php?id=647250
 ```
 Esta alteração foi possivel porque o utilizador descarregou um ficheiro pelo [link](https://bit.ly/2LRYDSQ%20). Este script, que não conseguimos transferir, foi a arma do ataque e realizou as mudanças na imagem atraves de estaganografia. O link já não se encontra disponivel e como o script foi colocado no diretório /tmp/, já não está presente no sistema.
 
+Por outro lado, foram adicionados os ficheiros `/var/www/html/r.php` e `srv/chroot-mariadb/var/tmp/x.txt`, conforme explicado anteriormente.
+
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
 Sim foram realizadas transferências, o atacante deve ter notado que ao clicarmos no catálogo de carros, o método para descarregar ficheiros era através de um php denominado **downloads.php**, pelo que o user tentou aceder outros ficheiros através desse link e conseguiu com sucesso, visto que nao havia confinamento a nivel do diretório de downloads e ele pode voltar atras nos diretórios.
