@@ -6,12 +6,12 @@ João Marques - 89234
 
 ## Topics:
 
-1. O que estava implementado a nível de confinamento de aplicações?
-2. Qual a sequência de ações que o atacante tomou?
-3. Que vulnerabilidades foram exploradas e como?
-4. Que alterações foram realizadas e qual o propósito aparente?
-5. Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
-6. Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
+1. [O que estava implementado a nível de confinamento de aplicações?](#o-que-estava-implementado-a-nível-de-confinamento-de-aplicações)
+2. [Qual a sequência de ações que o atacante tomou?](#qual-a-sequência-de-ações-que-o-atacante-tomou)
+3. [Que vulnerabilidades foram exploradas e como?](#que-vulnerabilidades-foram-exploradas-e-como)
+4. [Que alterações foram realizadas e qual o propósito aparente?](#que-alterações-foram-realizadas-e-qual-o-propósito-aparente)
+5. [Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?](#foram-realmente-realizadas-transferências-se-sim-como-e-qual-o-conteúdo)
+6. [Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?](#porque-é-que-a-Firewall-externa-detetou-transferências-mas-nao-detetou-as-restantes-ações)
 
 ### O que estava implementado a nível de confinamento de aplicações?
 
@@ -233,7 +233,7 @@ echo "Road Runner was here";
 Este ficheiro indica que o user conseguiu acesso a uma terminal, pois devido ao **Chroot** no servidor de base de dados, não era possivel o user escrever ficheiros na pasta var/html/www, no entanto como vimos no exemplo em cima, o user conseguiu escrever nessa pasta.
 
 Não encontramos, no entanto, nenhuma referência à criação deste ficheiro nos *logs*.
-Assumimos, assim, que o atacante ganhou acesso à máquina através do *backdoor* previamente mencionado e pôde criar o ficheiros através de uma sessão de utilizador, ou pôde apagar os logs que registaram os seus movimentos.
+Assumimos, assim, que o atacante ganhou acesso à máquina através do *backdoor* previamente mencionado e pôde apagar os logs que registaram os seus movimentos.
 
 ### Que vulnerabilidades foram exploradas e como?
 
@@ -242,8 +242,6 @@ O atacante explorou a vulnerabilidade a **SQL Injection** no *PHP* que tinha sid
 Por outro lado, aproveitou a falta de **confinamento** das aplicações e explorou esta vulnerabilidade de forma a aceder a todo o sistema a partir da vulnerabilidade persente no servidor *Apache*.
 
 Além disso, aproveitou o facto da máquina do servidor web ter um servidor **ssh** aberto com autenticação por password (vulnerável a ataques por *brute force*) e de o servidor da base de dados estar na mesma máquina.
-
-Outra vulnerabilidade explorada tem que ver com a arquitetura do sistema. A má aplicação da *firewall*, como explicado no último ponto do relatório, e o facto de o servidor web poder fazer pedidos a serviços externos aparentemente sem controlo levaram a que tenha sido possível descarregar dados, como *scripts*, de fontes desconhecidas, e assim injetar mais código malicioso.
 
 #### Quais o atacante tentou explorar mas foram barradas?
 
@@ -259,8 +257,6 @@ Parabéns!
 https://elearning.ua.pt/mod/assign/view.php?id=647250
 ```
 Esta alteração foi possivel porque o utilizador descarregou um ficheiro pelo [link](https://bit.ly/2LRYDSQ%20). Este script, que não conseguimos transferir, foi a arma do ataque e realizou as mudanças na imagem atraves de estaganografia. O link já não se encontra disponivel e como o script foi colocado no diretório /tmp/, já não está presente no sistema.
-
-Por outro lado, foram adicionados os ficheiros `/var/www/html/r.php` e `srv/chroot-mariadb/var/tmp/x.txt`, conforme explicado anteriormente.
 
 ### Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?
 
