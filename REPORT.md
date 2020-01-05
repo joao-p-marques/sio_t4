@@ -309,6 +309,8 @@ Já o shieldsdown.sh parece aceitar todo o tipo de pacotes, dai o nome dos escud
 
 O facto de termos encontrado estes ficheiros na maquina do servidor web leva-nos a crer que, no sistema em produção, a máquina que actua como firewall externa é a mesma que o próprio servidor, o que potenciou o acesso descrito anteriormente sem qualquer controlo.
 
+Ao analisar os pacotes capturados pela firewall, verificamos que, por exemplo, o ficheiro `steg_drop.py`, obtido através do comando *wget* a uma página externa, não foi detetado. Isto pode dever-se ao facto de a firewall não estar a implementar, efetivamente, uma defesa em perímetro, e assim passar por alto muito tráfego da máquina para outros sites. Portanto, outro tráfego criado pelo atacante para outras ações pode facilmente não ter sido detetado.
+
 Suspeitamos que o atacante tenha inicialmente realizado transferências e dai as podermos visualizar no tráfego da firewall externa.
 
 No entanto, tendo criada a **backdoor**, o user ganhou acesso ao sistema por completo, executando comandos numa sessão *ssh* encriptada e, portanto, impossível de analisar pela firewall. Por outro lado, pôde remover as limitações da firewall uma vez dentro da máquina.
