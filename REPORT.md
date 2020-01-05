@@ -300,14 +300,14 @@ iptables -A FORWARD -j ACCEPT
 iptables --flush
 ```
 
-Através da análise destas configurações do iptables, conseguimos perceber que a configuração inicial do shieldsup.sh aceita:  
+Através da análise destas configurações do iptables, conseguimos perceber que a configuração inicial do `shieldsup.sh` aceita:  
 * Pacotes do tipo ICMP
 * Pacotes vindo da interface lo
 * Pacotes novos TCP ao porto 80
 E recusa:  
  * Tudo o que não tiver sido declarado anteriormente, logo adotando uma politica de whitelisting.
 
-Já o shieldsdown.sh parece aceitar todo o tipo de pacotes, dai o nome dos escudos estarem em baixo, pois a proteção oferecida foi retirada.
+Já o `shieldsdown.sh` parece aceitar todo o tipo de pacotes, dai o nome dos escudos estarem em baixo, pois a proteção oferecida foi retirada.
 
 O facto de termos encontrado estes ficheiros na maquina do servidor web leva-nos a crer que, no sistema em produção, a máquina que actua como firewall externa é a mesma que o próprio servidor, o que potenciou o acesso descrito anteriormente sem qualquer controlo.
 
