@@ -283,6 +283,8 @@ Sim foram realizadas transferências, o atacante deve ter notado que ao clicarmo
 Apesar de as respostas terem sido todas de sucesso (200), nem todos os ficheiros foram transferidos, então analisamos no wireshark os ficheiros que o utilizador recebeu e chegamos a conclusão que ele transferiu todos exceto o ficheiro x.txt, visto que este não existia no sistema.
 E como conseguimos ver, o atacante conseguiu transferir alguns ficheiros criticos de sistema como **config.php** e **display.php** que lhe permitiram visualizar informação **crítica** do sistema.
 
+Por outro lado, o atacante pode **visualizar** o nome e conteúdo de muitas tabelas da base de dados graças à vulnerabilidade a SQL Injection referida anteriormente.
+
 ### Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?
 
 Ao pesquisarmos nos ficheiros do sistema, conseguimos encontrar dois ficheiros que são de extrema importancia, pois regem as configurações das firewalls.
