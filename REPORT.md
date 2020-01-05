@@ -100,6 +100,7 @@ Por outro lado, realizamos uma procura diretamente por aplicações de confiname
 	Binary file srv/chroot-mariadb/usr/libexec/mysqld matches
 	```
 Estas informações permitem-nos apenas concluir que estas aplicações estão presentes no sistema, não que estão a ser aplicadas. A ausência de *logs* relativos a estas aplicações no ficheiro `syslog` permite-nos assumir que não foram aplicadas no sistema em produção, apesar de instaladas. 
+
 No caso da aplicação **Chroot**, como verificamos a existência de ficheiros como `srv/chroot-mariadb/usr/libexec/mysqld`, assumimos que tenha sido aplicado confinamento à aplicação **MariaDB**/**MySQL**.
 
 Verificámos, também, por análise de vários ficheiros, como explicado posteriormente, que os vários serviços estavam divididos entre diferentes utilizadores do sistema. Apesar de isto ser normal e o comportamento por defeito destas aplicações, produz certo nível de confinamento das aplicações.
