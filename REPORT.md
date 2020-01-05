@@ -229,7 +229,7 @@ Verificamos também que foi criado o ficheiro `/var/www/html/r.php`:
 echo "Road Runner was here";
 ?>
 ```
-Este ficheiro indica que o user conseguiu acesso a uma terminal, pois devido ao Chroot no web Server, não era possivel o user escrever ficheiros na pasta var/html/www, no entanto como vimos no exemplo em cima, o user conseguiu escrever nessa pasta.
+Este ficheiro indica que o user conseguiu acesso a uma terminal, pois devido ao **Chroot** no servidor de base de dados, não era possivel o user escrever ficheiros na pasta var/html/www, no entanto como vimos no exemplo em cima, o user conseguiu escrever nessa pasta.
 
 Não encontramos, no entanto, nenhuma referência à criação deste ficheiro nos *logs*.
 Assumimos, assim, que o atacante ganhou acesso à máquina através do *backdoor* previamente mencionado e pôde apagar os logs que registaram os seus movimentos.
