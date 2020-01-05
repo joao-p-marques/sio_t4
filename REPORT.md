@@ -243,6 +243,8 @@ Por outro lado, aproveitou a falta de **confinamento** das aplicações e explor
 
 Além disso, aproveitou o facto da máquina do servidor web ter um servidor **ssh** aberto com autenticação por password (vulnerável a ataques por *brute force*) e de o servidor da base de dados estar na mesma máquina.
 
+Outra vulnerabilidade explorada tem que ver com a arquitetura do sistema. A má aplicação da *firewall*, como explicado no último ponto do relatório, e o facto de o servidor web poder fazer pedidos a serviços externos aparentemente sem controlo levaram a que tenha sido possível descarregar dados, como *scripts*, de fontes desconhecidas, e assim injetar mais código malicioso.
+
 #### Quais o atacante tentou explorar mas foram barradas?
 
 Verificamos, principalmente por análise do ficheiro `etc/httpd/logs/error_log`, que o atacante tentou aproveitar as vulnerabilidades no *PHP* para aceder à base de dados e a outros dados de sistema, mas não conseguiu devido ao **confinamento** de cada serviço a um utilizador diferente e à limitação de **permissões** para cada ficheiro.
